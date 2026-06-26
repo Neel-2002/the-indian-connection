@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Base page colour lives on <html> so the fixed ambient layer (z-index:-1)
+     can sit above it; if this were on <body> it would paint over the blobs. */
+  background-color: #FBF6EC;
+}
+
+body {
+  background-color: transparent;
+  color: #2A1418;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cinzel is a Roman inscriptional face — a little tracking helps it breathe */
+.font-display {
+  letter-spacing: 0.015em;
+}
+
+/* Saffron hairline divider — recurring heritage motif */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C24E12, transparent);
+  opacity: 0.55;
+}
+
+/* Small ornamental separator (diamond) for section headings */
+.ornament {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #C24E12;
+}
+.ornament::before,
+.ornament::after {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.glass {
+  background: rgba(251, 246, 236, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.glass-dark {
+  background: rgba(0, 39, 102, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Focus ring — saffron, visible for keyboard nav */
+*:focus-visible {
+  outline: 2px solid #C24E12;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Live "online" status dot */
+.live-ping {
+  animation: livePing 1.9s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes livePing {
+  0% { transform: scale(1); opacity: 0.7; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Button micro-interactions — lift, press, and a light sheen sweep */
+.btn-anim {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.btn-anim:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px -12px rgba(104, 19, 33, 0.55);
+}
+.btn-anim:active {
+  transform: translateY(0) scale(0.97);
+}
+.btn-anim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 65%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+.btn-anim:hover::after {
+  transform: translateX(130%);
+}
+
+/* Lighter variant for outline / secondary buttons (lift + press, no sheen) */
+.btn-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.btn-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px -10px rgba(104, 19, 33, 0.35);
+}
+.btn-lift:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Ambient drifting background — subtle heritage aurora */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambient-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+.drift-a {
+  animation: driftA 18s ease-in-out infinite alternate;
+}
+.drift-b {
+  animation: driftB 22s ease-in-out infinite alternate;
+}
+.drift-c {
+  animation: driftC 20s ease-in-out infinite alternate;
+}
+@keyframes driftA {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(14vw, 10vh, 0) scale(1.25); }
+}
+@keyframes driftB {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to   { transform: translate3d(-12vw, -9vh, 0) scale(0.95); }
+}
+@keyframes driftC {
+  from { transform: translate3d(0, 0, 0) scale(0.95); }
+  to   { transform: translate3d(10vw, -11vh, 0) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
