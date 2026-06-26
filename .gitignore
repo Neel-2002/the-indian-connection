@@ -1,0 +1,13 @@
+/node_modules
+/.next
+/out
+/build
+.env*
+.DS_Store
+*.log
+next-env.d.ts
+
+# Source assets / tooling (not needed in the deployed app)
+/images
+/videos
+/.claude
