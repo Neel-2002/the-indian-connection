@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bot, MessageCircle, X, Send, ArrowRight, Phone, Mail } from "lucide-react";
+import { Bot, MessageCircle, X, Send, ArrowRight, Phone, Mail, LogIn } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 import { allServices } from "@/lib/services";
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -30,6 +31,7 @@ interface ChatMsg {
   services?: boolean;
   serviceAction?: string; // service id -> "Open X request" button
   contact?: boolean;
+  signin?: boolean; // render a "Sign in" button
 }
 
 const QUICK_BOOK = "Book a service";
@@ -48,6 +50,7 @@ function detectService(text: string): string | null {
 
 export default function ChatBot() {
   const { t } = useLanguage();
+  const { isSignedIn } = useUser();
   const [open, setOpen] = useState(false);
   const [greeted, setGreeted] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -83,6 +86,13 @@ export default function ChatBot() {
   function openService(id: string) {
     const svc = allServices.find((s) => s.id === id);
     if (!svc) return;
+    if (!isSignedIn) {
+      pushBot({
+        text: t("You'll need to sign in first to send a request."),
+        signin: true,
+      });
+      return;
+    }
     pushBot({
       text: t("Opening the request form below — I've selected {service} for you.", {
         service: t(svc.name),
@@ -285,6 +295,19 @@ export default function ChatBot() {
                     >
                       <Phone className="h-4 w-4 text-saffron" strokeWidth={2} />
                       {t("Call us")}
+                    </a>
+                  </div>
+                )}
+
+                {/* Sign-in prompt */}
+                {m.signin && (
+                  <div className="mt-2">
+                    <a
+                      href="/sign-in"
+                      className="btn-anim inline-flex cursor-pointer items-center gap-2 rounded-full bg-maroon-700 px-4 py-2 text-sm font-semibold text-ivory hover:bg-maroon-900"
+                    >
+                      <LogIn className="h-4 w-4" strokeWidth={2} />
+                      {t("Sign in")}
                     </a>
                   </div>
                 )}

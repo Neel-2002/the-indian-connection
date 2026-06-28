@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { Resend } from "resend";
 
 export const runtime = "nodejs";
@@ -35,6 +36,15 @@ export async function POST(req: Request) {
 
   // Honeypot — silently accept bots without sending
   if (body.hp) return NextResponse.json({ ok: true });
+
+  // Require an authenticated user
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Please sign in to send your request." },
+      { status: 401 }
+    );
+  }
 
   const name = body.contact?.name?.trim();
   const phone = body.contact?.phone?.trim();

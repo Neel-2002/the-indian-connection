@@ -1,8 +1,10 @@
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import RequirementBuilder from "@/components/RequirementBuilder";
 import {
   BuilderIntro,
+  SignInGate,
   TrustBar,
   Process,
   VideoShowcase,
@@ -19,10 +21,15 @@ export default function Home() {
       <Navbar />
       <Hero />
 
-      {/* Centerpiece — interactive requirement builder */}
+      {/* Centerpiece — interactive requirement builder (requires sign-in) */}
       <section className="px-4 pb-20 pt-4 sm:pb-28">
         <BuilderIntro />
-        <RequirementBuilder />
+        <SignedIn>
+          <RequirementBuilder />
+        </SignedIn>
+        <SignedOut>
+          <SignInGate />
+        </SignedOut>
       </section>
 
       <TrustBar />
