@@ -8,10 +8,10 @@ export default function SignInPage() {
         <Image
           src="/logo-mark.png"
           alt="The Indian Connection — Redefining Bookings"
-          width={1225}
-          height={924}
+          width={610}
+          height={611}
           priority
-          className="h-16 w-auto"
+          className="h-20 w-20 rounded-full"
         />
       </a>
       <SignIn

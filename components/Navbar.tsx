@@ -50,10 +50,10 @@ export default function Navbar() {
           <Image
             src="/logo-mark.png"
             alt="The Indian Connection — Redefining Bookings"
-            width={1225}
-            height={924}
+            width={610}
+            height={611}
             priority
-            className="h-12 w-auto sm:h-14"
+            className="h-12 w-12 rounded-full sm:h-14 sm:w-14"
           />
         </a>
 
