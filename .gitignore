@@ -5,6 +5,7 @@
 .env*
 .DS_Store
 *.log
+*.tsbuildinfo
 next-env.d.ts
 
 # Source assets / tooling (not needed in the deployed app)
