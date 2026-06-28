@@ -80,7 +80,6 @@ export default function RequirementBuilder() {
     const next: Record<string, boolean> = {};
     if (!contact.name.trim()) next.name = true;
     if (!/^[+0-9 ]{8,15}$/.test(contact.phone.trim())) next.phone = true;
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact.email.trim())) next.email = true;
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -322,10 +321,8 @@ export default function RequirementBuilder() {
               <div className="sm:col-span-2">
                 <LabeledInput
                   label="Email"
+                  optional
                   value={contact.email}
-                  error={errors.email}
-                  errorMsg="Enter a valid email address."
-                  hint="We'll send your confirmation here."
                   placeholder="you@example.com"
                   onChange={(v) => setContact((c) => ({ ...c, email: v }))}
                 />

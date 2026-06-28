@@ -119,42 +119,9 @@ export async function POST(req: Request) {
     `Details:\n` +
     details.map((d) => `  • ${d.label}: ${d.value}`).join("\n");
 
-  // Branded confirmation for the customer
-  const firstName = name.split(" ")[0] || name;
-  const customerHtml = `
-  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;background:#FBF6EC;padding:24px;border-radius:16px">
-    <p style="margin:0 0 6px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#C24E12;font-weight:700">The Indian Connection · Redefining Bookings</p>
-    <h1 style="margin:0 0 8px;color:#681321;font-size:24px">We've received your request</h1>
-    <p style="margin:0 0 16px;color:#2A1418;font-size:15px;line-height:1.6">Namaste ${esc(
-      firstName
-    )}, thank you for reaching out. A dedicated concierge is reviewing your <strong>${esc(
-    service
-  )}</strong> request and will send you a transparent quotation shortly — usually within about 90 minutes. There's no payment needed to enquire.</p>
-
-    <div style="background:#ffffff;border:1px solid #E7DAC6;border-radius:12px;padding:16px 18px;margin-bottom:18px">
-      <p style="margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#174F72;font-weight:700">Your request — ${esc(
-        service
-      )}</p>
-      <table style="border-collapse:collapse;width:100%;font-size:14px">${
-        rows || '<tr><td style="color:#6E5A55">No details provided.</td></tr>'
-      }</table>
-    </div>
-
-    <a href="https://wa.me/918989189057" style="display:inline-block;background:#8E1F2F;color:#FBF6EC;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:999px">Chat with us on WhatsApp</a>
-
-    <p style="margin:18px 0 0;color:#6E5A55;font-size:12px;line-height:1.6">This is a confirmation of your enquiry, not a booking — you only pay after you approve the quotation.<br>The Indian Connection · Redefining Bookings</p>
-  </div>`;
-
-  const customerText =
-    `We've received your request — The Indian Connection\n\n` +
-    `Namaste ${firstName}, thank you for reaching out. A dedicated concierge is reviewing your ${service} request and will send a transparent quotation shortly (usually within ~90 minutes). No payment is needed to enquire.\n\n` +
-    `Your request — ${service}:\n` +
-    details.map((d) => `  • ${d.label}: ${d.value}`).join("\n") +
-    `\n\nQuestions? WhatsApp us at +91 89891 89057.\nThe Indian Connection · Redefining Bookings`;
-
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  // 1) Lead notification to the business (critical — failure returns an error)
+  // Lead notification to the business
   try {
     const { error } = await resend.emails.send({
       from: FROM,
@@ -165,37 +132,18 @@ export async function POST(req: Request) {
       text,
     });
     if (error) {
-      console.error("Resend error (lead):", error);
+      console.error("Resend error:", error);
       return NextResponse.json(
         { error: "Could not send the request. Please try again." },
         { status: 502 }
       );
     }
+    return NextResponse.json({ ok: true });
   } catch (e) {
-    console.error("Send failed (lead):", e);
+    console.error("Send failed:", e);
     return NextResponse.json(
       { error: "Could not send the request. Please try again." },
       { status: 500 }
     );
   }
-
-  // 2) Confirmation to the customer (best-effort — never fails the request)
-  const validEmail = !!email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-  if (validEmail) {
-    try {
-      const { error } = await resend.emails.send({
-        from: FROM,
-        to: email!,
-        replyTo: TO,
-        subject: "We've received your request — The Indian Connection",
-        html: customerHtml,
-        text: customerText,
-      });
-      if (error) console.error("Customer confirmation failed:", error);
-    } catch (e) {
-      console.error("Customer confirmation send failed:", e);
-    }
-  }
-
-  return NextResponse.json({ ok: true });
 }
