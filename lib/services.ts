@@ -20,6 +20,7 @@ export interface Field {
   options?: string[];
   optional?: boolean;
   half?: boolean; // render at half width on desktop
+  autocomplete?: "city"; // show Indian-city suggestions as the user types
 }
 
 export interface Service {
@@ -37,8 +38,8 @@ export const services: Service[] = [
     tagline: "Confirmed berths, even under Tatkal pressure.",
     icon: Train,
     questions: [
-      { id: "from", label: "Where are you starting from?", type: "text", placeholder: "e.g. New Delhi (NDLS)", half: true },
-      { id: "to", label: "Where are you going?", type: "text", placeholder: "e.g. Mumbai (CSTM)", half: true },
+      { id: "from", label: "Where are you starting from?", type: "text", placeholder: "e.g. New Delhi", half: true, autocomplete: "city" },
+      { id: "to", label: "Where are you going?", type: "text", placeholder: "e.g. Mumbai", half: true, autocomplete: "city" },
       { id: "date", label: "Date of travel", type: "date", half: true },
       { id: "passengers", label: "Number of passengers", type: "number", placeholder: "2", half: true },
       { id: "class", label: "Class preference", type: "select", options: ["AC First (1A)", "AC 2-Tier (2A)", "AC 3-Tier (3A)", "Sleeper (SL)", "No preference"], half: true },
@@ -53,8 +54,8 @@ export const services: Service[] = [
     tagline: "The right fare, the right cabin, handled.",
     icon: Plane,
     questions: [
-      { id: "from", label: "Departure city", type: "text", placeholder: "e.g. Bengaluru", half: true },
-      { id: "to", label: "Destination", type: "text", placeholder: "e.g. London", half: true },
+      { id: "from", label: "Departure city", type: "text", placeholder: "e.g. Bengaluru", half: true, autocomplete: "city" },
+      { id: "to", label: "Destination", type: "text", placeholder: "e.g. Delhi", half: true, autocomplete: "city" },
       { id: "depart", label: "Departure date", type: "date", half: true },
       { id: "return", label: "Return date", type: "date", optional: true, half: true },
       { id: "passengers", label: "Number of passengers", type: "number", placeholder: "1", half: true },
@@ -69,7 +70,7 @@ export const services: Service[] = [
     tagline: "Stays that match your taste and budget.",
     icon: Hotel,
     questions: [
-      { id: "city", label: "Which city?", type: "text", placeholder: "e.g. Udaipur", half: true },
+      { id: "city", label: "Which city?", type: "text", placeholder: "e.g. Udaipur", half: true, autocomplete: "city" },
       { id: "category", label: "Hotel category", type: "select", options: ["3 Star", "4 Star", "5 Star", "Luxury / Palace", "Boutique"], half: true },
       { id: "checkin", label: "Check-in date", type: "date", half: true },
       { id: "checkout", label: "Check-out date", type: "date", half: true },
