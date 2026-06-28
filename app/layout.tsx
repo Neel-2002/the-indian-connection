@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Cinzel, Montserrat } from "next/font/google";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 import { LanguageProvider } from "@/components/LanguageProvider";
-import { AuthProvider } from "@/components/AuthProvider";
 import AmbientBackground from "@/components/AmbientBackground";
 import ChatBot from "@/components/ChatBot";
 
@@ -36,12 +36,12 @@ export default function RootLayout({
     <html lang="en" className={`${cinzel.variable} ${montserrat.variable}`}>
       <body className="font-sans antialiased">
         <AmbientBackground />
-        <LanguageProvider>
-          <AuthProvider>
+        <ClerkProvider appearance={{ variables: { colorPrimary: "#8E1F2F" } }}>
+          <LanguageProvider>
             {children}
             <ChatBot />
-          </AuthProvider>
-        </LanguageProvider>
+          </LanguageProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

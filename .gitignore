@@ -11,3 +11,6 @@ next-env.d.ts
 /images
 /videos
 /.claude
+
+# clerk configuration (can include secrets)
+/.clerk/

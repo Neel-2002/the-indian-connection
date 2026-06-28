@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Menu, X, ChevronDown, LogOut } from "lucide-react";
+import { SignedIn, SignedOut, useUser, useClerk } from "@clerk/nextjs";
 import { useLanguage } from "@/components/LanguageProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { useAuth, initialsOf, type AuthUser } from "@/components/AuthProvider";
 
 const links = [
   { label: "Services", href: "#services" },
@@ -15,9 +15,18 @@ const links = [
   { label: "Stories", href: "#stories" },
 ];
 
+function initialsOf(s: string) {
+  const parts = s.trim().split(/[\s@.]+/).filter(Boolean);
+  return (
+    parts
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "★"
+  );
+}
+
 export default function Navbar() {
   const { t } = useLanguage();
-  const { user, openSignIn, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -62,16 +71,17 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <LanguageSwitcher />
-          {user ? (
-            <UserMenu user={user} signOut={signOut} />
-          ) : (
-            <button
-              onClick={openSignIn}
+          <SignedOut>
+            <a
+              href="/sign-in"
               className="cursor-pointer text-sm font-medium text-navy-900 transition-colors duration-200 hover:text-maroon-700"
             >
               {t("Sign in")}
-            </button>
-          )}
+            </a>
+          </SignedOut>
+          <SignedIn>
+            <UserMenu />
+          </SignedIn>
           <a
             href="#builder"
             className="btn-anim cursor-pointer rounded-full bg-maroon-700 px-5 py-2.5 text-sm font-semibold text-ivory hover:bg-maroon-900"
@@ -105,38 +115,20 @@ export default function Navbar() {
             <div className="mt-2 px-1">
               <LanguageSwitcher compact />
             </div>
-            {user ? (
-              <div className="mt-2 flex items-center justify-between rounded-xl border border-line px-4 py-3">
-                <span className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-saffron text-sm font-semibold text-ivory">
-                    {initialsOf(user.name, user.contact)}
-                  </span>
-                  <span className="text-sm font-medium text-navy-900">
-                    {user.name}
-                  </span>
-                </span>
-                <button
-                  onClick={() => {
-                    signOut();
-                    setOpen(false);
-                  }}
-                  className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-maroon-700"
-                >
-                  <LogOut className="h-4 w-4" strokeWidth={2} />
-                  {t("Sign out")}
-                </button>
+            <SignedIn>
+              <div className="mt-2">
+                <MobileUser onNavigate={() => setOpen(false)} />
               </div>
-            ) : (
-              <button
-                onClick={() => {
-                  openSignIn();
-                  setOpen(false);
-                }}
-                className="mt-2 rounded-xl border border-line px-4 py-3 text-center font-medium text-navy-900 transition-colors hover:bg-maroon-50"
+            </SignedIn>
+            <SignedOut>
+              <a
+                href="/sign-in"
+                onClick={() => setOpen(false)}
+                className="mt-2 w-full rounded-xl border border-line px-4 py-3 text-center font-medium text-navy-900 transition-colors hover:bg-maroon-50"
               >
                 {t("Sign in")}
-              </button>
-            )}
+              </a>
+            </SignedOut>
             <a
               href="#builder"
               onClick={() => setOpen(false)}
@@ -151,14 +143,28 @@ export default function Navbar() {
   );
 }
 
-function UserMenu({
-  user,
-  signOut,
-}: {
-  user: AuthUser;
-  signOut: () => void;
-}) {
+function displayName(user: ReturnType<typeof useUser>["user"]) {
+  return (
+    user?.fullName ||
+    user?.firstName ||
+    user?.primaryEmailAddress?.emailAddress ||
+    user?.primaryPhoneNumber?.phoneNumber ||
+    "Account"
+  );
+}
+
+function contactOf(user: ReturnType<typeof useUser>["user"]) {
+  return (
+    user?.primaryEmailAddress?.emailAddress ||
+    user?.primaryPhoneNumber?.phoneNumber ||
+    ""
+  );
+}
+
+function UserMenu() {
   const { t } = useLanguage();
+  const { user } = useUser();
+  const { signOut } = useClerk();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -170,17 +176,25 @@ function UserMenu({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  const name = displayName(user);
+  const contact = contactOf(user);
+
   return (
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex cursor-pointer items-center gap-2 rounded-full border border-line bg-white/60 py-1.5 pl-1.5 pr-3 transition-colors duration-200 hover:border-saffron hover:bg-maroon-50"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-saffron text-xs font-semibold text-ivory">
-          {initialsOf(user.name, user.contact)}
+        <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-saffron text-xs font-semibold text-ivory">
+          {user?.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.imageUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            initialsOf(name)
+          )}
         </span>
         <span className="max-w-[110px] truncate text-sm font-medium text-navy-900">
-          {user.name}
+          {name}
         </span>
         <ChevronDown
           className={`h-3.5 w-3.5 text-muted transition-transform duration-200 ${
@@ -194,7 +208,7 @@ function UserMenu({
         <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-line bg-white p-2 shadow-card">
           <div className="px-3 py-2">
             <p className="text-xs text-muted">{t("Signed in")}</p>
-            <p className="truncate text-sm font-medium text-ink">{user.contact}</p>
+            <p className="truncate text-sm font-medium text-ink">{contact || name}</p>
           </div>
           <div className="my-1 h-px bg-line" />
           <a
@@ -205,10 +219,7 @@ function UserMenu({
             {t("My requests")}
           </a>
           <button
-            onClick={() => {
-              signOut();
-              setOpen(false);
-            }}
+            onClick={() => signOut({ redirectUrl: "/" })}
             className="flex w-full cursor-pointer items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-maroon-700 transition-colors hover:bg-maroon-50"
           >
             <LogOut className="h-4 w-4" strokeWidth={2} />
@@ -216,6 +227,34 @@ function UserMenu({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function MobileUser({ onNavigate }: { onNavigate: () => void }) {
+  const { t } = useLanguage();
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const name = displayName(user);
+
+  return (
+    <div className="flex items-center justify-between rounded-xl border border-line px-4 py-3">
+      <span className="flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-saffron text-sm font-semibold text-ivory">
+          {initialsOf(name)}
+        </span>
+        <span className="truncate text-sm font-medium text-navy-900">{name}</span>
+      </span>
+      <button
+        onClick={() => {
+          onNavigate();
+          signOut({ redirectUrl: "/" });
+        }}
+        className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-maroon-700"
+      >
+        <LogOut className="h-4 w-4" strokeWidth={2} />
+        {t("Sign out")}
+      </button>
     </div>
   );
 }
