@@ -660,9 +660,9 @@ export function Footer() {
             <Image
               src="/logo-mark.png"
               alt="The Indian Connection — Redefining Bookings"
-              width={1225}
-              height={924}
-              className="h-16 w-auto"
+              width={610}
+              height={611}
+              className="h-16 w-16 rounded-full"
             />
             <p className="mt-4 max-w-xs text-sm text-muted">
               {t("Tell us where, we'll handle the rest — a premium human concierge for Indian travel.")}
