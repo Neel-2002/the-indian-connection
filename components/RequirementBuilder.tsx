@@ -667,7 +667,18 @@ function ErrorText() {
   return <p className="mt-1 text-xs text-red-500">{t("This field is required.")}</p>;
 }
 
-// City field with Indian-city suggestions (free typing still allowed)
+// City/town field — live OpenStreetMap (Photon) search, with the bundled
+// list as an offline fallback. Free typing is always allowed.
+function localMatches(q: string): string[] {
+  const lc = q.trim().toLowerCase();
+  if (!lc) return [];
+  const starts = INDIAN_CITIES.filter((c) => c.toLowerCase().startsWith(lc));
+  const rest = INDIAN_CITIES.filter(
+    (c) => !c.toLowerCase().startsWith(lc) && c.toLowerCase().includes(lc)
+  );
+  return [...starts, ...rest].slice(0, 7);
+}
+
 function CityAutocomplete({
   value,
   onChange,
@@ -679,20 +690,14 @@ function CityAutocomplete({
   placeholder?: string;
   error?: boolean;
 }) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [hi, setHi] = useState(-1);
+  const [results, setResults] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const matches = useMemo(() => {
-    const q = value.trim().toLowerCase();
-    if (!q) return [] as string[];
-    const starts = INDIAN_CITIES.filter((c) => c.toLowerCase().startsWith(q));
-    const rest = INDIAN_CITIES.filter(
-      (c) => !c.toLowerCase().startsWith(q) && c.toLowerCase().includes(q)
-    );
-    return [...starts, ...rest].slice(0, 7);
-  }, [value]);
-
+  // Close on outside click
   useEffect(() => {
     function onDoc(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -701,16 +706,62 @@ function CityAutocomplete({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  // Hide the list once the value already equals the only remaining match
-  const show =
-    open &&
-    matches.length > 0 &&
-    !(matches.length === 1 && matches[0].toLowerCase() === value.trim().toLowerCase());
+  // Debounced live search across Indian towns & villages (OpenStreetMap / Photon)
+  useEffect(() => {
+    const q = value.trim();
+    if (!open || q.length < 2) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const ctrl = new AbortController();
+    const id = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(
+            q
+          )}&lang=en&limit=8&lat=22&lon=79`,
+          { signal: ctrl.signal }
+        );
+        const data = await res.json();
+        const seen = new Set<string>();
+        const out: string[] = [];
+        for (const f of data.features ?? []) {
+          const p = f.properties || {};
+          if (p.countrycode !== "IN" || !p.name) continue;
+          const isPlace =
+            p.osm_key === "place" ||
+            (p.osm_key === "boundary" && p.osm_value === "administrative");
+          if (!isPlace) continue;
+          const region = p.state || p.county;
+          const label =
+            region && region !== p.name ? `${p.name}, ${region}` : p.name;
+          if (!seen.has(label)) {
+            seen.add(label);
+            out.push(label);
+          }
+        }
+        setResults((out.length ? out : localMatches(q)).slice(0, 7));
+      } catch (e) {
+        if ((e as Error).name !== "AbortError") setResults(localMatches(q));
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+    return () => {
+      clearTimeout(id);
+      ctrl.abort();
+    };
+  }, [value, open]);
+
+  const show = open && value.trim().length >= 2 && (loading || results.length > 0);
 
   function choose(c: string) {
     onChange(c);
     setOpen(false);
     setHi(-1);
+    setResults([]);
   }
 
   return (
@@ -729,13 +780,13 @@ function CityAutocomplete({
           if (!show) return;
           if (e.key === "ArrowDown") {
             e.preventDefault();
-            setHi((h) => Math.min(h + 1, matches.length - 1));
+            setHi((h) => Math.min(h + 1, results.length - 1));
           } else if (e.key === "ArrowUp") {
             e.preventDefault();
             setHi((h) => Math.max(h - 1, 0));
-          } else if (e.key === "Enter" && hi >= 0) {
+          } else if (e.key === "Enter" && hi >= 0 && results[hi]) {
             e.preventDefault();
-            choose(matches[hi]);
+            choose(results[hi]);
           } else if (e.key === "Escape") {
             setOpen(false);
           }
@@ -746,25 +797,32 @@ function CityAutocomplete({
         }`}
       />
       {show && (
-        <ul className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-line bg-white py-1 shadow-card">
-          {matches.map((c, i) => (
-            <li key={c}>
-              <button
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  choose(c);
-                }}
-                onMouseEnter={() => setHi(i)}
-                className={`flex w-full cursor-pointer items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors ${
-                  i === hi ? "bg-maroon-50 text-maroon-900" : "text-ink hover:bg-ivory"
-                }`}
-              >
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-saffron" strokeWidth={2} />
-                {c}
-              </button>
+        <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-line bg-white py-1 shadow-card">
+          {loading && results.length === 0 ? (
+            <li className="flex items-center gap-2 px-4 py-2.5 text-sm text-muted">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-saffron" strokeWidth={2} />
+              {t("Searching…")}
             </li>
-          ))}
+          ) : (
+            results.map((c, i) => (
+              <li key={c}>
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    choose(c);
+                  }}
+                  onMouseEnter={() => setHi(i)}
+                  className={`flex w-full cursor-pointer items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors ${
+                    i === hi ? "bg-maroon-50 text-maroon-900" : "text-ink hover:bg-ivory"
+                  }`}
+                >
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-saffron" strokeWidth={2} />
+                  {c}
+                </button>
+              </li>
+            ))
+          )}
         </ul>
       )}
     </div>
