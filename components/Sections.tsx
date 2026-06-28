@@ -48,6 +48,43 @@ export function BuilderIntro() {
   );
 }
 
+/* ---------------- Sign-in gate (shown when logged out) ---------------- */
+export function SignInGate() {
+  const { t } = useLanguage();
+  return (
+    <div
+      id="builder"
+      className="mx-auto w-full max-w-2xl overflow-hidden rounded-3xl border border-line bg-white p-10 text-center shadow-lift sm:p-14"
+    >
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-maroon-50">
+        <Lock className="h-8 w-8 text-maroon-700" strokeWidth={1.75} />
+      </div>
+      <h3 className="mt-5 font-display text-3xl font-semibold text-maroon-900">
+        {t("Sign in to start your request")}
+      </h3>
+      <p className="mx-auto mt-3 max-w-md text-muted">
+        {t(
+          "Please sign in or create an account to send your request to our concierge."
+        )}
+      </p>
+      <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a
+          href="/sign-in"
+          className="btn-anim inline-flex cursor-pointer items-center justify-center rounded-full bg-maroon-700 px-7 py-3.5 font-semibold text-ivory hover:bg-maroon-900"
+        >
+          {t("Sign in")}
+        </a>
+        <a
+          href="/sign-up"
+          className="btn-lift inline-flex cursor-pointer items-center justify-center rounded-full border border-navy-900/25 px-7 py-3.5 font-semibold text-navy-900 hover:bg-navy-50"
+        >
+          {t("Create account")}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- Trust indicators ---------------- */
 export function TrustBar() {
   const { t } = useLanguage();
