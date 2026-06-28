@@ -1,0 +1,28 @@
+import { SignIn } from "@clerk/nextjs";
+import Image from "next/image";
+
+export default function SignInPage() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-16">
+      <a href="/" className="mb-8" aria-label="The Indian Connection — home">
+        <Image
+          src="/logo-mark.png"
+          alt="The Indian Connection — Redefining Bookings"
+          width={1225}
+          height={924}
+          priority
+          className="h-16 w-auto"
+        />
+      </a>
+      <SignIn
+        appearance={{
+          variables: {
+            colorPrimary: "#8E1F2F",
+            colorText: "#1C1A15",
+            borderRadius: "0.85rem",
+          },
+        }}
+      />
+    </main>
+  );
+}
