@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { Resend } from "resend";
 
 export const runtime = "nodejs";
@@ -148,7 +148,6 @@ export async function POST(req: Request) {
         { status: 502 }
       );
     }
-    return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("Send failed:", e);
     return NextResponse.json(
@@ -156,4 +155,34 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+
+  // Save to the user's account so it shows in their dashboard (best-effort)
+  try {
+    const client = await clerkClient();
+    const u = await client.users.getUser(userId);
+    const prev = Array.isArray((u.privateMetadata as Record<string, unknown>)?.requests)
+      ? ((u.privateMetadata as { requests: unknown[] }).requests as unknown[])
+      : [];
+    const entry = {
+      id:
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : String(Date.now()),
+      service,
+      details: details.map((d) => ({
+        label: d.label,
+        value: String(d.value).slice(0, 160),
+      })),
+      createdAt: new Date().toISOString(),
+      status: "New",
+    };
+    const next = [entry, ...prev].slice(0, 15);
+    await client.users.updateUserMetadata(userId, {
+      privateMetadata: { requests: next },
+    });
+  } catch (e) {
+    console.error("Saving request to user metadata failed:", e);
+  }
+
+  return NextResponse.json({ ok: true });
 }

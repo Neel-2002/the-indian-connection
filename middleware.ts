@@ -1,8 +1,12 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// Clerk runs on every route but does not protect anything by default —
-// the marketing site and the request APIs stay public; sign-in is optional.
-export default clerkMiddleware();
+// The marketing site and request APIs stay public; only the dashboard
+// requires a signed-in user.
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) await auth.protect();
+});
 
 export const config = {
   matcher: [

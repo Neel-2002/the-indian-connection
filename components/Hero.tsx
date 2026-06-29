@@ -20,11 +20,7 @@ export default function Hero() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
         {/* Left — thesis */}
         <div className="animate-fade-up">
-          <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-saffron">
-            The Indian Connection · Redefining Bookings
-          </span>
-
-          <h1 className="mt-6 font-display text-5xl font-semibold leading-[1.05] text-maroon-900 sm:text-6xl lg:text-7xl">
+          <h1 className="font-display text-5xl font-semibold leading-[1.05] text-maroon-900 sm:text-6xl lg:text-7xl">
             {t("Tell us where.")}
             <br />
             <span className="text-navy-900">{t("We'll handle the rest.")}</span>
