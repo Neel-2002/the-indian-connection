@@ -75,6 +75,13 @@ body {
   70%, 100% { transform: scale(2.4); opacity: 0; }
 }
 
+/* Blur + tint the page behind Clerk's sign-in / sign-up modal */
+.cl-modalBackdrop {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  background-color: rgba(0, 39, 102, 0.35) !important;
+}
+
 /* Button micro-interactions — lift, press, and a light sheen sweep */
 .btn-anim {
   position: relative;
