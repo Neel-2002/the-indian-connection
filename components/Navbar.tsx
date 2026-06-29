@@ -40,7 +40,7 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
       <nav
-        className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 ${
+        className={`mx-auto flex max-w-7xl items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 ${
           scrolled
             ? "glass border-line shadow-card"
             : "border-transparent bg-transparent"
@@ -60,7 +60,7 @@ export default function Navbar() {
             className="h-12 w-12 rounded-full sm:h-14 sm:w-14"
           />
           <span className="hidden flex-col leading-none sm:flex">
-            <span className="whitespace-nowrap font-display text-xl font-semibold text-maroon-900">
+            <span className="whitespace-nowrap font-display text-lg font-semibold text-maroon-900">
               The Indian Connection
             </span>
             <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-saffron">
@@ -69,36 +69,37 @@ export default function Navbar() {
           </span>
         </a>
 
-        <div className="hidden items-center gap-8 lg:flex">
-          {links.map((l) => (
+        <div className="hidden items-center gap-6 lg:flex">
+          <div className="flex items-center gap-6">
+            {links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="text-sm font-medium text-ink/80 transition-colors duration-200 hover:text-maroon-700"
+              >
+                {t(l.label)}
+              </a>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="cursor-pointer text-sm font-medium text-navy-900 transition-colors duration-200 hover:text-maroon-700">
+                  {t("Sign in")}
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserMenu />
+            </SignedIn>
             <a
-              key={l.href}
-              href={l.href}
-              className="text-sm font-medium text-ink/80 transition-colors duration-200 hover:text-maroon-700"
+              href="#builder"
+              className="btn-anim cursor-pointer rounded-full bg-maroon-700 px-5 py-2.5 text-sm font-semibold text-ivory hover:bg-maroon-900"
             >
-              {t(l.label)}
+              {t("Start a request")}
             </a>
-          ))}
-        </div>
-
-        <div className="hidden items-center gap-3 lg:flex">
-          <LanguageSwitcher />
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="cursor-pointer text-sm font-medium text-navy-900 transition-colors duration-200 hover:text-maroon-700">
-                {t("Sign in")}
-              </button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserMenu />
-          </SignedIn>
-          <a
-            href="#builder"
-            className="btn-anim cursor-pointer rounded-full bg-maroon-700 px-5 py-2.5 text-sm font-semibold text-ivory hover:bg-maroon-900"
-          >
-            {t("Start a request")}
-          </a>
+          </div>
         </div>
 
         <button
@@ -111,7 +112,7 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="glass mx-auto mt-2 max-w-6xl rounded-3xl border border-line p-4 shadow-card lg:hidden">
+        <div className="glass mx-auto mt-2 max-w-7xl rounded-3xl border border-line p-4 shadow-card lg:hidden">
           <div className="flex flex-col gap-1">
             {links.map((l) => (
               <a
@@ -224,7 +225,7 @@ function UserMenu() {
           </div>
           <div className="my-1 h-px bg-line" />
           <a
-            href="#builder"
+            href="/dashboard"
             onClick={() => setOpen(false)}
             className="block rounded-xl px-3 py-2.5 text-sm font-medium text-navy-900 transition-colors hover:bg-maroon-50"
           >
