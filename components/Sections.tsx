@@ -24,6 +24,7 @@ import {
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { services } from "@/lib/services";
 import { useLanguage } from "@/components/LanguageProvider";
+import Reveal from "@/components/Reveal";
 
 interface Story {
   quote: string;
@@ -96,14 +97,14 @@ export function TrustBar() {
   return (
     <section className="border-y border-line bg-white/50 px-4 py-10">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
-        {items.map((s) => (
-          <div key={s.title} className="text-center">
+        {items.map((s, i) => (
+          <Reveal key={s.title} delay={i * 80} className="text-center">
             <s.icon className="mx-auto h-6 w-6 text-saffron" strokeWidth={1.5} />
             <p className="mt-2 font-display text-2xl font-semibold text-maroon-900">
               {t(s.title)}
             </p>
             <p className="text-sm text-muted">{t(s.sub)}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
       <div className="mx-auto mt-8 flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted">
@@ -139,20 +140,22 @@ export function Process() {
           subtitle="A premium concierge interview — not a booking form. Here's exactly what happens."
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s) => (
-            <div
-              key={s.n}
-              className="group relative rounded-3xl border border-line bg-white p-6 transition-shadow duration-300 hover:shadow-card"
-            >
-              <span className="font-display text-5xl font-semibold text-saffron/35">
-                {s.n}
-              </span>
-              <s.icon className="mt-3 h-7 w-7 text-navy-700" strokeWidth={1.5} />
-              <h3 className="mt-4 font-display text-2xl font-semibold text-maroon-900">
-                {t(s.title)}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{t(s.body)}</p>
-            </div>
+          {steps.map((s, i) => (
+            <Reveal key={s.n} delay={i * 90} className="h-full">
+              <div className="group relative h-full rounded-3xl border border-line bg-white p-6 transition-shadow duration-300 hover:shadow-card">
+                <span className="font-display text-5xl font-semibold text-saffron/35">
+                  {s.n}
+                </span>
+                <s.icon
+                  className="mt-3 h-7 w-7 text-navy-700 transition-transform duration-300 group-hover:scale-110"
+                  strokeWidth={1.5}
+                />
+                <h3 className="mt-4 font-display text-2xl font-semibold text-maroon-900">
+                  {t(s.title)}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{t(s.body)}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -170,7 +173,7 @@ export function VideoShowcase() {
           title="See The Indian Connection in action."
           subtitle="A short look at how we turn a simple request into a confirmed, worry-free journey."
         />
-        <div className="relative mt-12">
+        <Reveal className="relative mt-12">
           <div
             aria-hidden
             className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem]"
@@ -190,7 +193,7 @@ export function VideoShowcase() {
               Your browser does not support the video tag.
             </video>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -208,20 +211,21 @@ export function Services() {
           subtitle="From a single Tatkal berth to a fully curated honeymoon — one place, one concierge."
         />
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s) => (
-            <a
-              key={s.id}
-              href="#builder"
-              className="group flex cursor-pointer flex-col rounded-3xl border border-line bg-ivory p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-saffron hover:shadow-card"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-navy-900 text-ivory transition-colors duration-300 group-hover:bg-maroon-700">
-                <s.icon className="h-6 w-6" strokeWidth={1.5} />
-              </span>
-              <h3 className="mt-4 font-display text-2xl font-semibold text-maroon-900">
-                {t(s.name)}
-              </h3>
-              <p className="mt-1 text-sm text-muted">{t(s.tagline)}</p>
-            </a>
+          {services.map((s, i) => (
+            <Reveal key={s.id} delay={(i % 3) * 80} className="h-full">
+              <a
+                href="#builder"
+                className="group flex h-full cursor-pointer flex-col rounded-3xl border border-line bg-ivory p-6 transition-all duration-300 hover:-translate-y-1 hover:border-saffron hover:shadow-lift"
+              >
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-navy-900 text-ivory transition-all duration-300 group-hover:scale-105 group-hover:bg-maroon-700">
+                  <s.icon className="h-6 w-6" strokeWidth={1.5} />
+                </span>
+                <h3 className="mt-4 font-display text-2xl font-semibold text-maroon-900">
+                  {t(s.name)}
+                </h3>
+                <p className="mt-1 text-sm text-muted">{t(s.tagline)}</p>
+              </a>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -250,14 +254,19 @@ export function Benefits() {
           />
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
-          {items.map((it) => (
-            <div key={it.title} className="rounded-3xl border border-line bg-white p-6">
-              <it.icon className="h-7 w-7 text-saffron" strokeWidth={1.5} />
-              <h3 className="mt-4 font-display text-xl font-semibold text-maroon-900">
-                {t(it.title)}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{t(it.body)}</p>
-            </div>
+          {items.map((it, i) => (
+            <Reveal key={it.title} delay={i * 90} className="h-full">
+              <div className="group h-full rounded-3xl border border-line bg-white p-6 transition-shadow duration-300 hover:shadow-card">
+                <it.icon
+                  className="h-7 w-7 text-saffron transition-transform duration-300 group-hover:scale-110"
+                  strokeWidth={1.5}
+                />
+                <h3 className="mt-4 font-display text-xl font-semibold text-maroon-900">
+                  {t(it.title)}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{t(it.body)}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -308,9 +317,9 @@ export function Testimonials() {
 
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {stories.map((q, idx) => (
+            <Reveal key={`${q.name}-${idx}`} delay={(idx % 3) * 90} className="h-full">
             <figure
-              key={`${q.name}-${idx}`}
-              className={`flex flex-col rounded-3xl border p-7 transition-colors ${
+              className={`flex h-full flex-col rounded-3xl border p-7 transition-colors ${
                 q.pending
                   ? "border-saffron/50 bg-saffron/10"
                   : "border-ivory/15 bg-white/5"
@@ -348,6 +357,7 @@ export function Testimonials() {
                 </span>
               </figcaption>
             </figure>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -619,7 +629,7 @@ export function FinalCTA() {
   const { t } = useLanguage();
   return (
     <section className="px-4 py-20 sm:py-28">
-      <div className="mx-auto max-w-4xl rounded-[2rem] border border-saffron/30 bg-white p-10 text-center shadow-card sm:p-16">
+      <Reveal className="mx-auto max-w-4xl rounded-[2rem] border border-saffron/30 bg-white p-10 text-center shadow-card sm:p-16">
         <span className="ornament text-xs font-semibold uppercase tracking-[0.2em]">
           {t("Ready when you are")}
         </span>
@@ -638,7 +648,7 @@ export function FinalCTA() {
           {t("Start a request")}
           <ArrowRight className="h-4 w-4" strokeWidth={2} />
         </a>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -713,7 +723,7 @@ function SectionHeading({
 }) {
   const { t } = useLanguage();
   return (
-    <div className={align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-xl"}>
+    <Reveal className={align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-xl"}>
       <span
         className={`ornament text-xs font-semibold uppercase tracking-[0.2em] ${
           dark ? "!text-saffron-soft" : ""
@@ -731,6 +741,6 @@ function SectionHeading({
       {subtitle && (
         <p className={`mt-4 ${dark ? "text-ivory/70" : "text-muted"}`}>{t(subtitle)}</p>
       )}
-    </div>
+    </Reveal>
   );
 }
