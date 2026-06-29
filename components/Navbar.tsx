@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Menu, X, ChevronDown, LogOut } from "lucide-react";
-import { SignedIn, SignedOut, useUser, useClerk } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, useUser, useClerk } from "@clerk/nextjs";
 import { useLanguage } from "@/components/LanguageProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -46,7 +46,11 @@ export default function Navbar() {
             : "border-transparent bg-transparent"
         }`}
       >
-        <a href="#" className="flex items-center" aria-label="The Indian Connection — home">
+        <a
+          href="#"
+          className="flex items-center gap-2.5"
+          aria-label="The Indian Connection — home"
+        >
           <Image
             src="/logo-mark.png"
             alt="The Indian Connection — Redefining Bookings"
@@ -55,6 +59,14 @@ export default function Navbar() {
             priority
             className="h-12 w-12 rounded-full sm:h-14 sm:w-14"
           />
+          <span className="hidden flex-col leading-none sm:flex">
+            <span className="whitespace-nowrap font-display text-xl font-semibold text-maroon-900">
+              The Indian Connection
+            </span>
+            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-saffron">
+              Redefining Bookings
+            </span>
+          </span>
         </a>
 
         <div className="hidden items-center gap-8 lg:flex">
@@ -72,12 +84,11 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 lg:flex">
           <LanguageSwitcher />
           <SignedOut>
-            <a
-              href="/sign-in"
-              className="cursor-pointer text-sm font-medium text-navy-900 transition-colors duration-200 hover:text-maroon-700"
-            >
-              {t("Sign in")}
-            </a>
+            <SignInButton mode="modal">
+              <button className="cursor-pointer text-sm font-medium text-navy-900 transition-colors duration-200 hover:text-maroon-700">
+                {t("Sign in")}
+              </button>
+            </SignInButton>
           </SignedOut>
           <SignedIn>
             <UserMenu />
@@ -121,13 +132,14 @@ export default function Navbar() {
               </div>
             </SignedIn>
             <SignedOut>
-              <a
-                href="/sign-in"
-                onClick={() => setOpen(false)}
-                className="mt-2 w-full rounded-xl border border-line px-4 py-3 text-center font-medium text-navy-900 transition-colors hover:bg-maroon-50"
-              >
-                {t("Sign in")}
-              </a>
+              <SignInButton mode="modal">
+                <button
+                  onClick={() => setOpen(false)}
+                  className="mt-2 w-full rounded-xl border border-line px-4 py-3 text-center font-medium text-navy-900 transition-colors hover:bg-maroon-50"
+                >
+                  {t("Sign in")}
+                </button>
+              </SignInButton>
             </SignedOut>
             <a
               href="#builder"

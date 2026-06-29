@@ -21,6 +21,7 @@ import {
   Check,
   ArrowRight,
 } from "lucide-react";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { services } from "@/lib/services";
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -68,18 +69,16 @@ export function SignInGate() {
         )}
       </p>
       <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <a
-          href="/sign-in"
-          className="btn-anim inline-flex cursor-pointer items-center justify-center rounded-full bg-maroon-700 px-7 py-3.5 font-semibold text-ivory hover:bg-maroon-900"
-        >
-          {t("Sign in")}
-        </a>
-        <a
-          href="/sign-up"
-          className="btn-lift inline-flex cursor-pointer items-center justify-center rounded-full border border-navy-900/25 px-7 py-3.5 font-semibold text-navy-900 hover:bg-navy-50"
-        >
-          {t("Create account")}
-        </a>
+        <SignInButton mode="modal">
+          <button className="btn-anim inline-flex cursor-pointer items-center justify-center rounded-full bg-maroon-700 px-7 py-3.5 font-semibold text-ivory hover:bg-maroon-900">
+            {t("Sign in")}
+          </button>
+        </SignInButton>
+        <SignUpButton mode="modal">
+          <button className="btn-lift inline-flex cursor-pointer items-center justify-center rounded-full border border-navy-900/25 px-7 py-3.5 font-semibold text-navy-900 hover:bg-navy-50">
+            {t("Create account")}
+          </button>
+        </SignUpButton>
       </div>
     </div>
   );

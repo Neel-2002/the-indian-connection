@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bot, MessageCircle, X, Send, ArrowRight, Phone, Mail, LogIn } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignInButton } from "@clerk/nextjs";
 import { allServices } from "@/lib/services";
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -302,13 +302,12 @@ export default function ChatBot() {
                 {/* Sign-in prompt */}
                 {m.signin && (
                   <div className="mt-2">
-                    <a
-                      href="/sign-in"
-                      className="btn-anim inline-flex cursor-pointer items-center gap-2 rounded-full bg-maroon-700 px-4 py-2 text-sm font-semibold text-ivory hover:bg-maroon-900"
-                    >
-                      <LogIn className="h-4 w-4" strokeWidth={2} />
-                      {t("Sign in")}
-                    </a>
+                    <SignInButton mode="modal">
+                      <button className="btn-anim inline-flex cursor-pointer items-center gap-2 rounded-full bg-maroon-700 px-4 py-2 text-sm font-semibold text-ivory hover:bg-maroon-900">
+                        <LogIn className="h-4 w-4" strokeWidth={2} />
+                        {t("Sign in")}
+                      </button>
+                    </SignInButton>
                   </div>
                 )}
 
