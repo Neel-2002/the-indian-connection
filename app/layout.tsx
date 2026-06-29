@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import AmbientBackground from "@/components/AmbientBackground";
 import ChatBot from "@/components/ChatBot";
+import ScrollProgress from "@/components/ScrollProgress";
 
 // Roman inscriptional serif — matches "THE INDIAN CONNECTION" wordmark
 const cinzel = Cinzel({
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="en" className={`${cinzel.variable} ${montserrat.variable}`}>
       <body className="font-sans antialiased">
         <AmbientBackground />
+        <ScrollProgress />
         <ClerkProvider appearance={{ variables: { colorPrimary: "#8E1F2F" } }}>
           <LanguageProvider>
             {children}
